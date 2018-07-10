@@ -40,7 +40,7 @@ All HTTPS requests to Losant are made asynchronously. Each method that makes an 
 #### Callback Response Object ####
 
 | Key | Type | Description |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | *statuscode* | Integer | HTTP status code (or libcurl error code) |
 | *headers* | Table | Squirrel table of returned HTTP headers |
 | *body* | String | Returned HTTP body (if any) |
