@@ -26,8 +26,9 @@ class Losant {
 
     static VERSION = "1.0.0";
 
-    _baseURL = null;
-    _headers = null;
+    _baseURL        = null;
+    _headers        = null;
+    _cmdListenerReq = null;
 
     /***************************************************************************************
      * constructor
@@ -220,6 +221,36 @@ class Losant {
     }
 
     /***************************************************************************************
+     * openDeviceCommandStream - Opens a listener for commands directed at this device
+     * Returns: null
+     * Parameters:
+     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+     *      onData (required): function - Callback function called when data is received
+     *      onError (required) : function - Callback function called when error is
+     *                                      encountered
+     **************************************************************************************/
+    function openDeviceCommandStream(losDevId, onData, onError) {
+        _cmdListenerReq = http.get(format("%s/%s/commandStream", _baseURL, losDevId), _headers);
+        _cmdListenerReq.sendasync(_cmdRespFactory(losDevId, onData, onError), _onDataFactory(onData, onError));
+    }
+
+    /***************************************************************************************
+     * closeDeviceCommandStream - Closes a listener for commands directed at this device
+     * Returns: null
+     * Parameters:
+     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+     *      cmd (required): table - Expected keys include: name, time, payload
+     *      cb (required) : function - callback function called when response is received
+     *                                 from Losant
+     **************************************************************************************/
+    function closeDeviceCommandStream() {
+        if (_cmdListenerReq != null) {
+            _cmdListenerReq.cancel();
+            _cmdListenerReq = null;
+        }
+    }
+
+    /***************************************************************************************
      * getDeviceLogs - Retrieve the recent log entries about the device
      * Returns: null
      * Parameters:
@@ -269,6 +300,68 @@ class Losant {
     function createIsoTimeStamp(ts = null) {
         local d = ts ? date(ts) : date();
         return format("%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", d.year, d.month+1, d.day, d.hour, d.min, d.sec, d.usec / 1000);
+    }
+
+    /***************************************************************************************
+     * _cmdRespFactory - Creates function that reopen stream if it closes for known reason,
+     *                   otherwise calls onError callback.
+     * Returns: function
+     * Parameters:
+     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+     *      onData (required): function - Callback function called when data is received
+     *      onError (required) : function - Callback function called when error is
+     *                                      encountered
+     **************************************************************************************/
+    function _cmdRespFactory(losDevId, onData, onError) {
+        return function (resp) {
+            if (resp.statuscode == 28 || resp.statuscode == 200) {
+                // Reopen listener
+                imp.wakeup(0, function() {
+                    openDeviceCommandStream(losDevId, onData, onError);
+                }.bindenv(this));
+            } else {
+                imp.wakeup(0, function() {
+                    onError(resp);
+                }.bindenv(this))
+            }
+            // Reset request variable
+            cmdListenerReq = null;
+        }.bindenv(this)
+    }
+
+    /***************************************************************************************
+     * _onDataFactory - Creates function that parses incomming data message or calls
+     *                  OnError callback if parsing fails.
+     * Returns: function
+     * Parameters:
+     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+     *      onData (required): function - Callback function called when data is received
+     *      onError (required) : function - Callback function called when error is
+     *                                      encountered
+     **************************************************************************************/
+    function _onDataFactory(onData, onError) {
+        return function(content) {
+            // Eliminate keepalive pings
+            if (content != ":keepalive\n\n") {
+                try {
+                    // Parse content to get to data table
+                    local arr = split(content, "\n");
+                    if (arr[1].find("data:") != null) {
+                        // chop "data: " off the top of string, so
+                        // table can be decoded
+                        local data = arr[1].slice(6);
+                        data = http.jsondecode(data);
+                        // Pass command to callback
+                        imp.wakeup(0, function() {
+                            onData(data);
+                        }.bindenv(this))
+                    }
+                } catch(e) {
+                    // Parser failed, pass payload to user
+                    onError({"error" : e, "command" : content});
+                }
+            }
+        }.bindenv(this)
     }
 
 }

@@ -486,6 +486,67 @@ lsntTrackerApp.getDeviceCommand(lsntDeviceId, function(response) {
 });
 ```
 
+### openDeviceCommandStream(*losDevId, onData, onError*) ###
+
+Opens stream that listens for commands directed at this device. **Note:** Only one stream can be open at a time. If *openDeviceCommandStream()* will close a stream that is currently open and will open a new stream.
+
+#### Parameters ####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *onData* | function | Yes | Called when a command is received from Losant. Takes a single parameter, a table, containing the command received from Losant. |
+| *onError* | function | Yes | Called if stream is closed unexpectedly or if command cannot be parsed. Takes a single parameter, a table containing the response of the failed stream or a table with parsing error and the unparsed command. |
+
+
+#### Return Value ####
+
+None.
+
+#### Example ####
+
+```squirrel
+function onData(command) {
+    server.log(command.name);
+    server.log(command.payload);
+}
+
+onError(data) {
+    server.error("Error occured while listening for commands.");
+
+    if ("error" in data) {
+        server.error(data.error);
+        server.log(command);
+    }
+
+    if ("statuscode" in data) {
+        server.log("Status code: " + data.statuscode);
+        server.log(resp.body);
+        // TODO: Reopen stream depending on why it closed.
+    }
+}
+
+lsntTrackerApp.openDeviceCommandStream(lsntDeviceId, onData, onError);
+```
+
+### closeDeviceCommandStream() ###
+
+Closes command stream if one is open.
+
+#### Parameters ####
+
+None.
+
+#### Return Value ####
+
+None.
+
+#### Example ####
+
+```squirrel
+lsntTrackerApp.closeDeviceCommandStream();
+```
+
 ### getDeviceLogs(*losantDeviceId, callback*) ###
 
 Retrieve the recent log entries for the specified device.
