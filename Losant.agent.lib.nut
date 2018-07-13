@@ -345,6 +345,8 @@ class Losant {
             if (content != ":keepalive\n\n") {
                 try {
                     // Parse content to get to data table
+                    // Data is formatted according to SSE (server-sent-event) spec
+                    // https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
                     local arr = split(content, "\n");
                     if (arr[1].find("data:") != null) {
                         // chop "data: " off the top of string, so
