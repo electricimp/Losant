@@ -2,7 +2,7 @@
 
 This library wraps the Losant REST API. It supports most of the [Device Actions](https://docs.losant.com/rest-api/device/) and [Devices Actions](https://docs.losant.com/rest-api/devices/) allowing the Imp to create, update and delete devices on the Losant platform. The library also supports sending commands to devices and updating the current state of a device.
 
-To use this library you must have a [Losant Account](https://accounts.losant.com/create-account) and you will also need to create an [application](https://docs.losant.com/applications/overview/).
+To use this library you need to have a Losant [account](https://accounts.losant.com/create-account) and [application](https://docs.losant.com/applications/overview/).
 
 **To use this library, add** `#require "Losant.agent.lib.nut:1.0.0"` **to the top of your device or agent code.**
 
@@ -10,7 +10,7 @@ To use this library you must have a [Losant Account](https://accounts.losant.com
 
 ### Constructor: Losant(*appId, apiToken*) ###
 
-Each instance of the class will connect the device with a Losant Application (identified by the Application Id). All methods will send and receive data via this application only.
+Each instance of the class will connect the device with a Losant [application](https://docs.losant.com/applications/overview/) (identified by the Application Id). All methods will send and receive data via this application only.
 
 #### Parameters ####
 
@@ -123,35 +123,6 @@ lsntTrackerApp.createDevice(deviceInfo, function(res) {
 })
 ```
 
-### createTagFilterQueryParams(*tags*) ###
-
-Formats device info tag array into query parameter format.
-
-#### Parameters ####
-
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| *tags* | Array | Yes | Array of tag tables with slots "key" and/or "value". |
-
-#### Return Value ####
-
-A tag filter query parameter string.
-
-#### Example ####
-
-```squirrel
-local searchTags = [
-    {
-      "key"   : "agentId",
-      "value" : split(http.agenturl(), "/").top()
-    },
-    {
-      "value" : imp.configparams.deviceid
-    }
-]
-local qparams = lsntTrackerApp.createTagFilterQueryParams(searchTags);
-```
-
 ### getDevices(*callback[, queryParams]*) ###
 
 Fetches a list of application devices, if query parameter is pass in the list will be filtered.
@@ -161,7 +132,7 @@ Fetches a list of application devices, if query parameter is pass in the list wi
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
-| *queryParams* | String | No | Query parameters to be added to the url, used to filter results |
+| *queryParams* | String | No | Query parameters to be added to the url, used to filter results. See [*createTagFilterQueryParams()*](#createtagfilterqueryparamstags) method for example. |
 
 #### Return Value ####
 
@@ -331,27 +302,6 @@ lsntTrackerApp.deleteDevice(lsntDeviceId, function(response) {
     // Log if delete was successful
     server.log(response.body);
 });
-```
-
-### createIsoTimeStamp(*[epochTime]*) ###
-
-Creates a UTC combined date time timestamp based on ISO 8601 standards. If *epochTime* parameter is passed in it will be reformatted, otherwise the current time will be used.
-
-#### Parameters ####
-
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| *epochTime* | Integer | No | Integer returned by calling *time()*, the current date and time as elapsed seconds since midnight, 1 Jan 1970. |
-
-#### Return Value ####
-
-A string timestamp.
-
-#### Example ####
-
-```squirrel
-local now = lsntTrackerApp.createIsoTimeStamp();
-server.log(now);
 ```
 
 ### sendDeviceState(*losantDeviceId, deviceState, callback*) ###
@@ -559,6 +509,56 @@ lsntTrackerApp.getDeviceLogs(lsntDeviceId, function(response) {
     // Log device logs
     server.log(response.body);
 });
+```
+
+### createIsoTimeStamp(*[epochTime]*) ###
+
+Creates a UTC combined date time timestamp based on ISO 8601 standards. If *epochTime* parameter is passed in it will be reformatted, otherwise the current time will be used.
+
+#### Parameters ####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *epochTime* | Integer | No | Integer returned by calling *time()*, the current date and time as elapsed seconds since midnight, 1 Jan 1970. |
+
+#### Return Value ####
+
+A string timestamp.
+
+#### Example ####
+
+```squirrel
+local now = lsntTrackerApp.createIsoTimeStamp();
+server.log(now);
+```
+
+### createTagFilterQueryParams(*tags*) ###
+
+Formats device info tag array into query parameter format.
+
+#### Parameters ####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *tags* | Array | Yes | Array of tag tables with slots "key" and/or "value". |
+
+#### Return Value ####
+
+A tag filter query parameter string.
+
+#### Example ####
+
+```squirrel
+local searchTags = [
+    {
+      "key"   : "agentId",
+      "value" : split(http.agenturl(), "/").top()
+    },
+    {
+      "value" : imp.configparams.deviceid
+    }
+]
+local qparams = lsntTrackerApp.createTagFilterQueryParams(searchTags);
 ```
 
 ## License ##
