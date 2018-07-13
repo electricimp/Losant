@@ -313,7 +313,7 @@ Send the current state of the device.
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
-| *deviceState* | Table | Yes | A table with device state. The keys in this table should correspond to the device's attributes. |
+| *deviceState* | Table or Array of Tables | Yes | A table with device state or an array of tables with device state. The keys in the table(s) should correspond to the device's attributes. |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
 #### Return Value ####

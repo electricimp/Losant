@@ -176,7 +176,8 @@ class Losant {
      * Returns: null
      * Parameters:
      *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      devState (required) : table - Table slots should match device attributes
+     *      devState (required) : table or array of tables - Table slots must match
+     *                            device attributes
      *      cb (required) : function - callback function called when response is received
      *                                 from Losant
      **************************************************************************************/
