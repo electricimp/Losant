@@ -179,4 +179,4 @@ class LosantApp {
 }
 
 app <- LosantApp();
-device.on("data", app.sendData);
+device.on("data", app.sendData.bindenv(app);
