@@ -230,6 +230,11 @@ class Losant {
      *                                      encountered
      **************************************************************************************/
     function openDeviceCommandStream(losDevId, onData, onError) {
+        // Don't allow more than one stream open at a time
+        if (_cmdListenerReq != null) {
+            cmdListenerReq.cancel();
+            cmdListenerReq = null;
+        }
         _cmdListenerReq = http.get(format("%s/%s/commandStream", _baseURL, losDevId), _headers);
         _cmdListenerReq.sendasync(_cmdRespFactory(losDevId, onData, onError), _onDataFactory(onData, onError));
     }
@@ -321,7 +326,7 @@ class Losant {
                 }.bindenv(this));
             } else {
                 imp.wakeup(0, function() {
-                    onError(resp);
+                    onError("ERROR: Command stream closed unexpectedly.", resp);
                 }.bindenv(this))
             }
             // Reset request variable
@@ -360,7 +365,7 @@ class Losant {
                     }
                 } catch(e) {
                     // Parser failed, pass payload to user
-                    onError({"error" : e, "command" : content});
+                    onError("ERROR: Parsing command streaming data failed " + e, content);
                 }
             }
         }.bindenv(this)

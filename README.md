@@ -496,7 +496,7 @@ Opens stream that listens for commands directed at this device. **Note:** Only o
 | --- | --- | --- | --- |
 | *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
 | *onData* | function | Yes | Called when a command is received from Losant. Takes a single parameter, a table, containing the command received from Losant. |
-| *onError* | function | Yes | Called if stream is closed unexpectedly or if command cannot be parsed. Takes a single parameter, a table containing the response of the failed stream or a table with parsing error and the unparsed command. |
+| *onError* | function | Yes | Called if stream is closed unexpectedly or if command cannot be parsed. Takes two parameters, the error encountered, and the response from Losant. |
 
 
 #### Return Value ####
@@ -511,18 +511,16 @@ function onData(command) {
     server.log(command.payload);
 }
 
-onError(data) {
+onError(error, response) {
     server.error("Error occured while listening for commands.");
+    server.error(error);
 
-    if ("error" in data) {
-        server.error(data.error);
-        server.log(command);
-    }
-
-    if ("statuscode" in data) {
-        server.log("Status code: " + data.statuscode);
-        server.log(resp.body);
+    if ("statuscode" in response) {
+        server.log("Status code: " + response.statuscode);
+        server.log(response.body);
         // TODO: Reopen stream depending on why it closed.
+    } else {
+        server.log(response);
     }
 }
 
