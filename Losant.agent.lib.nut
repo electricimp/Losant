@@ -232,8 +232,8 @@ class Losant {
     function openDeviceCommandStream(losDevId, onData, onError) {
         // Don't allow more than one stream open at a time
         if (_cmdListenerReq != null) {
-            cmdListenerReq.cancel();
-            cmdListenerReq = null;
+            _cmdListenerReq.cancel();
+            _cmdListenerReq = null;
         }
         _cmdListenerReq = http.get(format("%s/%s/commandStream", _baseURL, losDevId), _headers);
         _cmdListenerReq.sendasync(_cmdRespFactory(losDevId, onData, onError), _onDataFactory(onData, onError));
@@ -330,7 +330,7 @@ class Losant {
                 }.bindenv(this))
             }
             // Reset request variable
-            cmdListenerReq = null;
+            _cmdListenerReq = null;
         }.bindenv(this)
     }
 
