@@ -516,10 +516,11 @@ onError(error, response) {
     server.error(error);
 
     if ("statuscode" in response) {
+        // HTTP error occurred
         server.log("Status code: " + response.statuscode);
         server.log(response.body);
-        // TODO: Reopen stream depending on why it closed.
     } else {
+        // Parsing error occurred
         server.log(response);
     }
 }
@@ -543,6 +544,24 @@ None.
 
 ```squirrel
 lsntTrackerApp.closeDeviceCommandStream();
+```
+
+### isDeviceCommandStreamOpen() ###
+
+Returns a boolen, whether a command stream is open.
+
+#### Parameters ####
+
+None.
+
+#### Return Value ####
+
+Boolean, if steam is currently open.
+
+#### Example ####
+
+```squirrel
+server.log("Device command stream is open: " + lsntTrackerApp.isDeviceCommandStreamOpen());
 ```
 
 ### getDeviceLogs(*losantDeviceId, callback*) ###

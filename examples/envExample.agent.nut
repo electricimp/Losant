@@ -32,14 +32,14 @@
 class LosantApp {
 
     lsntApp        = null;
-    cmdListenerReq = null;
     lsntDeviceId   = null;
     impDeviceId    = null;
     agentId        = null;
 
     function __statics__() {
         // API Token for Losant application
-        const LOSANT_DEVICE_API_TOKEN = "<YOUR API TOKEN>";
+        const LOSANT_API_TOKEN        = "<YOUR API TOKEN>";
+        const LOSANT_APPLICATION_ID   = "<YOUR APPLICAITON TOKEN>";
         const DEVICE_NAME_TEMPLATE    = "Tracker_%s";
         const DEVICE_DESCRIPTION      = "Electric Imp Device";
         const LOSANT_DEVICE_CLASS     = "standalone";
@@ -49,9 +49,11 @@ class LosantApp {
         agentId = split(http.agenturl(), "/").top();
         impDeviceId = imp.configparams.deviceid;
 
-        lsntApp = Losant(LOSANT_APPLICATION_ID, LOSANT_DEVICE_API_TOKEN);
+        lsntApp = Losant(LOSANT_APPLICATION_ID, LOSANT_API_TOKEN);
         // Check if device with this agent and device id combo exists, create if need
+        server.log("Check Losant app for devices with matching tags.");
         _getLosantDeviceId();
+        openCommandListener();
     }
 
     function sendData(data) {
@@ -64,11 +66,79 @@ class LosantApp {
 
         local payload = {
             "time" : lsntApp.createIsoTimeStamp(),
-            "data" : data
+            "data" : {}
         };
 
-        // server.log(http.jsonencode(payload));
+        // Make sure data sent matches the attribute name
+        if ("temperature" in data) payload.data.temperature <- data.temperature;
+        if ("humidity" in data) payload.data.humidity <- data.humidity;
+
+        server.log("Sending device state:");
+        server.log(http.jsonencode(payload));
         lsntApp.sendDeviceState(lsntDeviceId, payload, _sendDeviceStateHandler.bindenv(this));
+    }
+
+    function openCommandListener() {
+        // If we are not configured try again in 5 sec
+        if (lsntDeviceId == null) {
+            imp.wakeup(5, openCommandListener.bindenv(this));
+            return;
+        }
+
+        server.log("Opening streaming listener...");
+        lsntApp.openDeviceCommandStream(lsntDeviceId, _commandHandler.bindenv(this), _onStreamError.bindenv(this));
+    }
+
+    function updateDevice(newAttributes, newTags = null) {
+        if (lsntDeviceId != null) {
+            if (newTags == null) newTags = _createTags();
+            local deviceInfo = {
+                "name"        : format(DEVICE_NAME_TEMPLATE, agentId),
+                "description" : DEVICE_DESCRIPTION,
+                "deviceClass" : LOSANT_DEVICE_CLASS,
+                "tags"        : newTags,
+                "attributes"  : newAttributes
+            }
+            server.log("Updating device.");
+            lsntApp.updateDeviceInfo(lsntDeviceId, deviceInfo, function(res) {
+                server.log("Update device status code: " + res.statuscode);
+                server.log(res.body);
+            }.bindenv(this))
+        } else {
+            server.log("Losant device id not retrieved yet. Try again.");
+        }
+    }
+
+    // This function shows how to add a device attribute
+    function addLocationAttribute() {
+        updateDevice([
+            {
+                "name"     : "temperature",
+                "dataType" : "number"
+            },
+            {
+                "name"     : "humidity",
+                "dataType" : "number"
+            },
+            {
+                "name"     : "location",
+                "dataType" : "gps"
+            }
+        ]);
+    }
+
+    // This function shows how to remove a device attribute
+    function removeLocationAttribute() {
+        updateDevice([
+            {
+                "name"     : "temperature",
+                "dataType" : "number"
+            },
+            {
+                "name"     : "humidity",
+                "dataType" : "number"
+            }
+        ]);
     }
 
     function _getLosantDeviceId() {
@@ -95,14 +165,43 @@ class LosantApp {
                 "tags"        : _createTags(),
                 "attributes"  : _createAttrs()
             }
+            server.log("Creating new device.");
             lsntApp.createDevice(deviceInfo, _createDeviceHandler.bindenv(this))
         }
     }
 
     function _sendDeviceStateHandler(res) {
+        // Log only if not successfull
         if (res.statuscode != 200) {
             server.log(res.statuscode);
             server.log(res.body);
+        }
+    }
+
+    function _commandHandler(cmd) {
+        // Keys: "name", "time", "payload"
+        // server.log(http.jsonencode(cmd));
+        // server.log(cmd.name);
+        switch(cmd.name) {
+            // TODO: add cases to handle specific commands
+            default:
+                server.log("Received command: " + cmd.name);
+                server.log(cmd.payload);
+        }
+    }
+
+    function _onStreamError(err, res) {
+        server.log("Streaming error occurred...");
+        server.error(err);
+
+        if ("statuscode" in res) {
+            // HTTP error
+            server.log("Status code: " + res.statuscode);
+            server.log("Response: " + res.body);
+            // TODO: based on status code, decide if should re-open stream
+        } else {
+            // Parsing error
+            server.log("Response: " + res);
         }
     }
 
@@ -110,10 +209,11 @@ class LosantApp {
         // server.log(res.statuscode);
         // server.log(res.body);
         local body = http.jsondecode(res.body);
+        server.log("Device created.");
         if ("deviceId" in body) {
             lsntDeviceId = body.deviceId;
         } else {
-            server.error("Device id not found.");
+            server.error("Losant device id not found.");
             server.log(res.body);
         }
     }
@@ -128,14 +228,19 @@ class LosantApp {
             switch (body.count) {
                 case 0:
                     // No devices found, create device
+                    server.log("Device not found.");
                     _createDevice();
                     break;
                 case 1:
                     // We found the device, store the losDevId
+                    server.log("Device with matching tags found.");
                     if ("items" in body && "deviceId" in body.items[0]) {
                         lsntDeviceId = body.items[0].deviceId;
+                        // Make sure the attributes and tags in Losant
+                        // match the current code.
+                        updateDevice(_createAttrs, _createTags);
                     } else {
-                        server.error("Device id not found.");
+                        server.error("Losant device id not in payload.");
                         server.log(res.body);
                     }
                     break;
@@ -178,5 +283,6 @@ class LosantApp {
     }
 }
 
+
 app <- LosantApp();
-device.on("data", app.sendData.bindenv(app);
+device.on("data", app.sendData.bindenv(app));

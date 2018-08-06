@@ -30,15 +30,14 @@ class Losant {
     _headers        = null;
     _cmdListenerReq = null;
 
-    /***************************************************************************************
-     * constructor
-     * Returns: null
-     * Parameters:
-     *      appId (reqired) : string - Losant application ID
-     *      apiToken (required) : string - Token for Losant application, used to authorize
-     *                                     all HTTP requests, must have device and devices
-     *                                     permissions.
-     **************************************************************************************/
+
+     // constructor
+     // Returns: null
+     // Parameters:
+     //      appId (reqired) : string - Losant application ID
+     //      apiToken (required) : string - Token for Losant application, used to authorize
+     //                                     all HTTP requests, must have device and devices
+     //                                     permissions.
     constructor(appId, apiToken) {
         _baseURL = format("https://api.losant.com/applications/%s/devices", appId);
         _headers = { "Content-Type"  : "application/json",
@@ -46,16 +45,14 @@ class Losant {
                      "Authorization" : format("Bearer %s", apiToken)};
     }
 
-    /***************************************************************************************
-     * getDevices - Fetches a list of application devices, if query parameter is pass in
-     *              the list will be filtered
-     * Returns: null
-     * Parameters:
-     *      cb (reqired) : function - callback function called when response is received
-     *                                 from Losant
-     *      queryParams (optional) : string - query parameters to be added to the url
-     *                                        used to filter device results
-     **************************************************************************************/
+    // getDevices - Fetches a list of application devices, if query parameter is pass in
+    //              the list will be filtered
+    // Returns: null
+    // Parameters:
+    //      cb (reqired) : function - callback function called when response is received
+    //                                 from Losant
+    //      queryParams (optional) : string - query parameters to be added to the url
+    //                                        used to filter device results
     function getDevices(cb, queryParams = null) {
         // Returns the devices for an application
         // GET /applications/{applicationId}/devices
@@ -64,15 +61,13 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * createDevice - Create a new device for application passed into the constructor
-     * Returns: null
-     * Parameters:
-     *      devInfo (required) : table - Expected keys include: name, description, tags,
-     *                                  deviceClass, attributes
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // createDevice - Create a new device for application passed into the constructor
+    // Returns: null
+    // Parameters:
+    //      devInfo (required) : table - Expected keys include: name, description, tags,
+    //                                  deviceClass, attributes
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function createDevice(devInfo, cb) {
         // Create a new device for an application
         // POST /applications/{applicationId}/devices
@@ -80,14 +75,12 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * sendDevicesCommand - Sends a command to multiple devices
-     * Returns: null
-     * Parameters:
-     *      cmd (required) : table - Expected keys include: name, time, payload
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // sendDevicesCommand - Sends a command to multiple devices
+    // Returns: null
+    // Parameters:
+    //      cmd (required) : table - Expected keys include: name, time, payload
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function sendDevicesCommand(cmd, cb) {
         // Send a command to multiple devices
         // POST /applications/{applicationId}/devices/command
@@ -95,14 +88,12 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * getDeviceInfo - Retrieves information for specified device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // getDeviceInfo - Retrieves information for specified device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function getDeviceInfo(losDevId, cb) {
         // Retrieves information on a device
         // GET /applications/{applicationId}/devices/{deviceId}
@@ -110,16 +101,14 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * updateDeviceInfo - Updates information for specified device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      devInfo (required) : table - Updated device info table. Keys may include: name,
-     *                                  description, tags, deviceClass, attributes
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // updateDeviceInfo - Updates information for specified device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      devInfo (required) : table - Updated device info table. Keys may include: name,
+    //                                  description, tags, deviceClass, attributes
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function updateDeviceInfo(losDevId, devInfo, cb) {
         // Updates information about a device
         // PATCH /applications/{applicationId}/devices/{deviceId}
@@ -127,14 +116,12 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * deleteDevice - Deletes specified device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // deleteDevice - Deletes specified device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function deleteDevice(losDevId, cb) {
         // Deletes a device
         // DELETE /applications/{applicationId}/devices/{deviceId}
@@ -142,14 +129,12 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * getDeviceState - Retrieve the last known state(s) of the device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // getDeviceState - Retrieve the last known state(s) of the device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function getDeviceState(losDevId, cb) {
         // Retrieve the last known state(s) of the device
         // GET /applications/{applicationId}/devices/{deviceId}/state
@@ -157,14 +142,12 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * getDeviceCompositeState - Retrieve the composite last complete state of the device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // getDeviceCompositeState - Retrieve the composite last complete state of the device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function getDeviceCompositeState(losDevId, cb) {
         // Retrieve the composite last complete state of the device
         // GET /applications/{applicationId}/devices/{deviceId}/compositeState
@@ -172,16 +155,14 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * sendDeviceState - Send the current state of the device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      devState (required) : table or array of tables - Table slots must match
-     *                            device attributes
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // sendDeviceState - Send the current state of the device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      devState (required) : table or array of tables - Table slots must match
+    //                            device attributes
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function sendDeviceState(losDevId, devState, cb) {
         // Send the current state of the device
         // POST /applications/{applicationId}/devices/{deviceId}/state
@@ -189,14 +170,12 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * getDeviceCommand - Retrieve the last known commands(s) sent to the device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // getDeviceCommand - Retrieve the last known commands(s) sent to the device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function getDeviceCommand(losDevId, cb) {
         // Retrieve the last known commands(s) sent to the device
         // GET /applications/{applicationId}/devices/{deviceId}/command
@@ -204,15 +183,13 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * sendDeviceCommand - Send a command to specified device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      cmd (required): table - Expected keys include: name, time, payload
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // sendDeviceCommand - Send a command to specified device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      cmd (required): table - Expected keys include: name, time, payload
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function sendDeviceCommand(losDevId, cmd, cb) {
         // Send a command to a device
         // POST /applications/{applicationId}/devices/{deviceId}/command
@@ -220,34 +197,28 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * openDeviceCommandStream - Opens a listener for commands directed at this device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      onData (required): function - Callback function called when data is received
-     *      onError (required) : function - Callback function called when error is
-     *                                      encountered
-     **************************************************************************************/
+    // openDeviceCommandStream - Opens a listener for commands directed at this device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      onData (required): function - Callback function called when data is received
+    //      onError (required) : function - Callback function called when error is
+    //                                      encountered
     function openDeviceCommandStream(losDevId, onData, onError) {
         // Don't allow more than one stream open at a time
-        if (_cmdListenerReq != null) {
-            _cmdListenerReq.cancel();
-            _cmdListenerReq = null;
-        }
+        closeDeviceCommandStream();
+
         _cmdListenerReq = http.get(format("%s/%s/commandStream", _baseURL, losDevId), _headers);
         _cmdListenerReq.sendasync(_cmdRespFactory(losDevId, onData, onError), _onDataFactory(onData, onError));
     }
 
-    /***************************************************************************************
-     * closeDeviceCommandStream - Closes a listener for commands directed at this device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      cmd (required): table - Expected keys include: name, time, payload
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // closeDeviceCommandStream - Closes a listener for commands directed at this device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      cmd (required): table - Expected keys include: name, time, payload
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function closeDeviceCommandStream() {
         if (_cmdListenerReq != null) {
             _cmdListenerReq.cancel();
@@ -255,14 +226,19 @@ class Losant {
         }
     }
 
-    /***************************************************************************************
-     * getDeviceLogs - Retrieve the recent log entries about the device
-     * Returns: null
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      cb (required) : function - callback function called when response is received
-     *                                 from Losant
-     **************************************************************************************/
+    // isStreamOpen - Returns whether stream is currently open
+    // Returns: boolean, if a stream is currently open
+    // Parameters: none
+    function isDeviceCommandStreamOpen() {
+        return (_cmdListenerReq == null);
+    }
+
+    // getDeviceLogs - Retrieve the recent log entries about the device
+    // Returns: null
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      cb (required) : function - callback function called when response is received
+    //                                 from Losant
     function getDeviceLogs(losDevId, cb) {
         // Retrieve the recent log entries about the device
         // GET /applications/{applicationId}/devices/{deviceId}/logs
@@ -270,13 +246,12 @@ class Losant {
         req.sendasync(cb);
     }
 
-    /***************************************************************************************
-     * createTagFilterQueryParams - Formats tag array into query parameter format
-     * Returns: string - Formatted to be used as query parameter for getDevices method
-     * Parameters:
-     *      tags (required) : array of tables - this should be formatted the same as tags
-     *                        are formatted, however not all key(s) or value(s) are required
-     **************************************************************************************/
+
+    // createTagFilterQueryParams - Formats tag array into query parameter format
+    // Returns: string - Formatted to be used as query parameter for getDevices method
+    // Parameters:
+    //      tags (required) : array of tables - this should be formatted the same as tags
+    //                        are formatted, however not all key(s) or value(s) are required
     function createTagFilterQueryParams(tags) {
         // Takes array of tables - must match device tag(s)
         // [{"key" : "agentId", "value" : agentId}, {"key" : "impDevId", "value" :  impDeviceId}]
@@ -296,27 +271,23 @@ class Losant {
         return params.slice(0, params.len() - 1);
     }
 
-    /***************************************************************************************
-     * createIsoTimeStamp
-     * Returns: string - with time formatted as "2015-12-03T00:54:51.000Z"
-     * Parameters:
-     *      ts (optional) : integer - epoch timestamp as returned by time()
-     **************************************************************************************/
+    // createIsoTimeStamp
+    // Returns: string - with time formatted as "2015-12-03T00:54:51.000Z"
+    // Parameters:
+    //      ts (optional) : integer - epoch timestamp as returned by time()
     function createIsoTimeStamp(ts = null) {
         local d = ts ? date(ts) : date();
         return format("%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", d.year, d.month+1, d.day, d.hour, d.min, d.sec, d.usec / 1000);
     }
 
-    /***************************************************************************************
-     * _cmdRespFactory - Creates function that reopen stream if it closes for known reason,
-     *                   otherwise calls onError callback.
-     * Returns: function
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      onData (required): function - Callback function called when data is received
-     *      onError (required) : function - Callback function called when error is
-     *                                      encountered
-     **************************************************************************************/
+    // _cmdRespFactory - Creates function that reopen stream if it closes for known reason,
+    //                   otherwise calls onError callback.
+    // Returns: function
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      onData (required): function - Callback function called when data is received
+    //      onError (required) : function - Callback function called when error is
+    //                                      encountered
     function _cmdRespFactory(losDevId, onData, onError) {
         return function (resp) {
             if (resp.statuscode == 28 || resp.statuscode == 200) {
@@ -334,16 +305,14 @@ class Losant {
         }.bindenv(this)
     }
 
-    /***************************************************************************************
-     * _onDataFactory - Creates function that parses incomming data message or calls
-     *                  OnError callback if parsing fails.
-     * Returns: function
-     * Parameters:
-     *      losDevId (required) : string - Losant device id (this is NOT the imp device id)
-     *      onData (required): function - Callback function called when data is received
-     *      onError (required) : function - Callback function called when error is
-     *                                      encountered
-     **************************************************************************************/
+    // _onDataFactory - Creates function that parses incomming data message or calls
+    //                  OnError callback if parsing fails.
+    // Returns: function
+    // Parameters:
+    //      losDevId (required) : string - Losant device id (this is NOT the imp device id)
+    //      onData (required): function - Callback function called when data is received
+    //      onError (required) : function - Callback function called when error is
+    //                                      encountered
     function _onDataFactory(onData, onError) {
         return function(content) {
             // Eliminate keepalive pings
