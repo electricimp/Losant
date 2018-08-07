@@ -1,0 +1,12 @@
+{
+  "deviceGroupId": "fbe6992a-9ff9-8d87-108c-6c0e65acf90e",
+  "timeout": 90,
+  "stopOnFail": false,
+  "allowDisconnect": false,
+  "builderCache": false,
+  "testFiles": [
+    "*.test.nut",
+    "tests/**/*.test.nut"
+  ],
+  "agentFile": "Losant.agent.lib.nut"
+}
