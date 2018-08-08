@@ -230,7 +230,7 @@ class Losant {
     // Returns: boolean, if a stream is currently open
     // Parameters: none
     function isDeviceCommandStreamOpen() {
-        return (_cmdListenerReq == null);
+        return (_cmdListenerReq != null);
     }
 
     // getDeviceLogs - Retrieve the recent log entries about the device

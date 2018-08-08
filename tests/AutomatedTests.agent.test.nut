@@ -41,7 +41,7 @@ class AutomatedTestCase extends ImpTestCase {
 
         // Make sure we start tests with no devices matching this device id in account.
         // NOTE: Test order matters, create device test must be first test (tests start at 10).
-        // This tests getDevices with no query params, and maybe delete device.
+        // This tests getDevices with query params, and maybe delete device.
         return _deleteAllDevicesWithThisDeviceId();
     }
 
@@ -219,7 +219,7 @@ class AutomatedTestCase extends ImpTestCase {
                 }.bindenv(this));
             }.bindenv(this)),
             Promise(function(resolve, reject) {
-                imp.wakeup(1, function() {
+                imp.wakeup(5, function() {
                     // Get device state
                     // info("getting device state");
                     _lsntApp.getDeviceState(_lsntDeviceId, function(resp) {
@@ -237,7 +237,7 @@ class AutomatedTestCase extends ImpTestCase {
                 }.bindenv(this))
             }.bindenv(this)),
             Promise(function(resolve, reject) {
-                imp.wakeup(2, function() {
+                imp.wakeup(6, function() {
                     // Get device composite state
                     // info("getting device composite state");
                     _lsntApp.getDeviceCompositeState(_lsntDeviceId, function(resp) {
@@ -319,7 +319,7 @@ class AutomatedTestCase extends ImpTestCase {
                 }.bindenv(this))
             }.bindenv(this)),
             Promise(function(resolve, reject) {
-                imp.wakeup(1, function() {
+                imp.wakeup(5, function() {
                     _lsntApp.getDeviceCommand(_lsntDeviceId, function(resp) {
                         if (resp.statuscode != 200) return reject("Get device command request failed. Status code: " + resp.statuscode);
                         try {
@@ -342,7 +342,86 @@ class AutomatedTestCase extends ImpTestCase {
     }
 
     function test20_deviceCommandStreams() {
+        local command = {
+            "time"    : _lsntApp.createIsoTimeStamp(),
+            "name"    : "testStreamingCommand",
+            "payload" : "send device command"
+        }
+        local cmdCounter = 0;
 
+        return Promise(function(resolve, reject) {
+            // Open listener
+            _lsntApp.openDeviceCommandStream(_lsntDeviceId, function(cmd) {
+                try {
+                    if (cmd.name == command.name) {
+                        assertEqual(cmd.payload, command.payload);
+                        cmdCounter++;
+                    }
+                } catch(e) {
+                    return reject("Command parsing error.");
+                }
+            }.bindenv(this),
+            function(error, r) {
+                return reject("Streaming error: " + error);
+            }.bindenv(this))
+
+            // Send command
+            imp.wakeup(5, function() {
+                _lsntApp.sendDeviceCommand(_lsntDeviceId, command, function(resp) {
+                    if (resp.statuscode != 200) return reject("Get device command request failed. Status code: " + resp.statuscode);
+                    try {
+                        local body = http.jsondecode(resp.body);
+                        assertTrue(body.success);
+                    } catch(e) {
+                        return reject("Send device command parsing error: " + e);
+                    }
+                    imp.wakeup(5, function() {
+                        try {
+                            // Check that streaming listener has received command
+                            assertEqual(1, cmdCounter);
+                            assertTrue(_lsntApp.isDeviceCommandStreamOpen());
+                            // Close Stream
+                            _lsntApp.closeDeviceCommandStream();
+                            assertTrue(!_lsntApp.isDeviceCommandStreamOpen());
+                        } catch(e) {
+                            return reject("Unexpected steaming response " + e);
+                        }
+                        // Send command to closed stream
+                        imp.wakeup(5, function() {
+                            _lsntApp.sendDeviceCommand(_lsntDeviceId, command, function(res) {
+                                if (resp.statuscode != 200) return reject("Get device command request failed. Status code: " + resp.statuscode);
+                                if (cmdCounter == 1) {
+                                    return resolve("Device command stream opened, received message, and closed.");
+                                } else {
+                                    return reject("Device stream received message after closed stream called.");
+                                }
+                            }.bindenv(this))
+                        }.bindenv(this))
+                    }.bindenv(this))
+                }.bindenv(this))
+            }.bindenv(this))
+        }.bindenv(this))
+    }
+
+    function test21_sendDevicesCommand() {
+        local command = {
+            "time"    : _lsntApp.createIsoTimeStamp(),
+            "name"    : "testDevicesCommand",
+            "payload" : "send devices command"
+        }
+
+        return Promise(function(resolve, reject) {
+            _lsntApp.sendDevicesCommand(command, function(resp) {
+                if (resp.statuscode != 200) return reject("Get device command request failed. Status code: " + resp.statuscode);
+                try {
+                    local body = http.jsondecode(resp.body);
+                    assertTrue(body.success);
+                } catch(e) {
+                    return reject("Send devices command parsing error: " + e);
+                }
+                return resolve("Send devices command request succeeded");
+            }.bindenv(this))
+        }.bindenv(this))
     }
 
     function tearDown() {
