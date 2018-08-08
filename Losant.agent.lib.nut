@@ -297,7 +297,7 @@ class Losant {
                 }.bindenv(this));
             } else {
                 imp.wakeup(0, function() {
-                    onError("ERROR: Command stream closed unexpectedly.", resp);
+                    onError("ERROR: Command stream received error. Status code: " + resp.statuscode, resp);
                 }.bindenv(this))
             }
             // Reset request variable
