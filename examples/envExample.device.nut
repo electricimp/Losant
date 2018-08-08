@@ -50,7 +50,7 @@ class EnvMonitor {
         _th.read(function(result) {
             if ("temperature" in result || "humidity" in result) {
                 // If we got a valid reading send to agent
-                agent.send(result);
+                agent.send("data", result);
             }
         }.bindenv(this));
 
