@@ -26,10 +26,11 @@ class Losant {
 
     static VERSION = "1.0.0";
 
-    _baseURL        = null;
-    _headers        = null;
-    _cmdListenerReq = null;
-
+    _baseURL          = null;
+    _headers          = null;
+    _cmdListenerReq   = null;
+    _kaTimeout        = null;
+    _onStreamingError = null;
 
      // constructor
      // Returns: null
@@ -204,12 +205,19 @@ class Losant {
     //      onData (required): function - Callback function called when data is received
     //      onError (required) : function - Callback function called when error is
     //                                      encountered
-    function openDeviceCommandStream(losDevId, onData, onError) {
+    //      keepAliveTimeout (optional) : float/integer - (between 2 & 60 sec) ammount of time
+    //                                                    in seconds to wait for a keep alive
+    //                                                    ping before closing stream.
+    function openDeviceCommandStream(losDevId, onData, onError, kaTimeout = 30) {
         // Don't allow more than one stream open at a time
         closeDeviceCommandStream();
 
         _cmdListenerReq = http.get(format("%s/%s/commandStream", _baseURL, losDevId), _headers);
         _cmdListenerReq.sendasync(_cmdRespFactory(losDevId, onData, onError), _onDataFactory(onData, onError));
+        // Start streaming watchdog
+        _kaTimeout = kaTimeout;
+        _onStreamingError = onError;
+        _startKeepAliveTimer();
     }
 
     // closeDeviceCommandStream - Closes a listener for commands directed at this device
@@ -296,8 +304,11 @@ class Losant {
                     openDeviceCommandStream(losDevId, onData, onError);
                 }.bindenv(this));
             } else {
+                // Make sure the stream is closed, call the error callback
+                closeDeviceCommandStream();
                 imp.wakeup(0, function() {
-                    onError("ERROR: Command stream received error. Status code: " + resp.statuscode, resp);
+                    onError("ERROR: Command stream closed, received error. Status code: " + resp.statuscode, resp);
+                    _onStreamingError = null;
                 }.bindenv(this))
             }
             // Reset request variable
@@ -315,7 +326,9 @@ class Losant {
     //                                      encountered
     function _onDataFactory(onData, onError) {
         return function(content) {
-            // Eliminate keepalive pings
+            // Restart keep alive timer
+            _startKeepAliveTimer();
+            // Process all data that is not a keepalive ping
             if (content != ":keepalive\n\n") {
                 try {
                     // Parse content to get to data table
@@ -338,6 +351,22 @@ class Losant {
                 }
             }
         }.bindenv(this)
+    }
+
+    // _startKeepAliveTimer - Cancels keep alive timer if it is running and restarts a keep alive timer. If timer
+    //                        is not reset stream will be closed and streaming error handler will be called.
+    // Returns : nothing
+    // Parameters : none
+    function _startKeepAliveTimer() {
+        if (_cmdListernerWatchdog) {
+            imp.cancelwakeup(_cmdListernerWatchdog);
+            _cmdListernerWatchdog = null;
+        }
+        _cmdListernerWatchdog = imp.wakeup(_kaTimeout, function() {
+            closeDeviceCommandStream();
+            _onStreamingError("ERROR: Command stream closed. No response from server in " + _kaTimeout + " seconds", null);
+            _onStreamingError = null;
+        }.bindenv(this));
     }
 
 }

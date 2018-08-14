@@ -191,17 +191,17 @@ class LosantApp {
     }
 
     function _onStreamError(err, res) {
-        server.log("Streaming error occurred...");
-        server.error(err);
+        server.error("Error occured while listening for commands.");
+        server.error(error);
 
-        if ("statuscode" in res) {
-            // HTTP error
-            server.log("Status code: " + res.statuscode);
-            server.log("Response: " + res.body);
-            // TODO: based on status code, decide if should re-open stream
+        if (lsntTrackerApp.isDeviceCommandStreamOpen()) {
+            // Parsing error occurred
+            server.log(response);
         } else {
-            // Parsing error
-            server.log("Response: " + res);
+            // HTTP error occurred
+            if ("statuscode" in response) server.log("Status code: " + response.statuscode);
+            // Reopen stream
+            openCommandListener();
         }
     }
 

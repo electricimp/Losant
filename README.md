@@ -236,7 +236,7 @@ Retrieves information for specified device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
 #### Return Value ####
@@ -261,7 +261,7 @@ Updates information for specified device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *deviceInfo* | Table | Yes | A table with updated device info. See API docs for [table details](https://docs.losant.com/rest-api/device/#patch) |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
@@ -287,7 +287,7 @@ Deletes specified device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
 #### Return Value ####
@@ -312,7 +312,7 @@ Send the current state of the device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *deviceState* | Table or Array of Tables | Yes | A table with device state or an array of tables with device state. The keys in the table(s) should correspond to the device's attributes. |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
@@ -356,7 +356,7 @@ Retrieve the last known state(s) of the device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
 #### Return Value ####
@@ -381,7 +381,7 @@ Retrieve the composite last complete state of the device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
 #### Return Value ####
@@ -437,7 +437,7 @@ Send a command to specified device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *command* | Table | Yes | A command table. See API docs for [table details](https://docs.losant.com/rest-api/device/#send-command) |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
@@ -469,7 +469,7 @@ Retrieve the last known commands(s) sent to the specified device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
 #### Return Value ####
@@ -486,7 +486,7 @@ lsntTrackerApp.getDeviceCommand(lsntDeviceId, function(response) {
 });
 ```
 
-### openDeviceCommandStream(*losDevId, onData, onError*) ###
+### openDeviceCommandStream(*losDevId, onData, onError[, keepAliveTimeout]*) ###
 
 Opens stream that listens for commands directed at this device. **Note:** Only one stream can be open at a time. If *openDeviceCommandStream()* will close a stream that is currently open and will open a new stream.
 
@@ -494,9 +494,10 @@ Opens stream that listens for commands directed at this device. **Note:** Only o
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
-| *onData* | function | Yes | Called when a command is received from Losant. Takes a single parameter, a table, containing the command received from Losant. |
-| *onError* | function | Yes | Called if stream is closed unexpectedly or if command cannot be parsed. Takes two parameters, the error encountered, and the response from Losant. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
+| *onData* | Function | Yes | Called when a command is received from Losant. Takes a single parameter, a table, containing the command received from Losant. |
+| *onError* | Function | Yes | Called if stream is closed unexpectedly or if command cannot be parsed. Takes two parameters, the error encountered, and the response from Losant. |
+| *keepAliveTimeout* | Integer/Float | Yes | Ammount of time in seconds to wait for a keep alive ping from Losant before closing stream. Keep alive pings from Losant are sent every 2 seconds. Default *keepAliveTimeout* is set to 30 seconds. |
 
 
 #### Return Value ####
@@ -515,13 +516,14 @@ onError(error, response) {
     server.error("Error occured while listening for commands.");
     server.error(error);
 
-    if ("statuscode" in response) {
-        // HTTP error occurred
-        server.log("Status code: " + response.statuscode);
-        server.log(response.body);
-    } else {
+    if (lsntTrackerApp.isDeviceCommandStreamOpen()) {
         // Parsing error occurred
         server.log(response);
+    } else {
+        // HTTP error occurred
+        if ("statuscode" in response) server.log("Status code: " + response.statuscode);
+        // Reopen stream
+        lsntTrackerApp.openDeviceCommandStream(lsntDeviceId, onData, onError);
     }
 }
 
@@ -572,7 +574,7 @@ Retrieve the recent log entries for the specified device.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *losantDeviceId* | String | No | Device Id assigned by Losant when device is created. |
+| *losantDeviceId* | String | Yes | Device Id assigned by Losant when device is created. |
 | *callback* | function | Yes | Called when response is received (see [Callback Functions](#callback-functions) above) |
 
 #### Return Value ####
