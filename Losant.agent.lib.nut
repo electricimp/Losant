@@ -26,11 +26,12 @@ class Losant {
 
     static VERSION = "1.0.0";
 
-    _baseURL          = null;
-    _headers          = null;
-    _cmdListenerReq   = null;
-    _kaTimeout        = null;
-    _onStreamingError = null;
+    _baseURL              = null;
+    _headers              = null;
+    _cmdListenerReq       = null;
+    _cmdListernerWatchdog = null;
+    _kaTimeout            = null;
+    _onStreamingError     = null;
 
      // constructor
      // Returns: null
