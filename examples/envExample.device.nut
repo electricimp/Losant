@@ -34,10 +34,11 @@ class EnvMonitor {
     _th  = null;
 
     constructor() {
-        // Configure Explorer Kit Temp/Humid sensor
+        // Update "local i2c" if you are not using an Explorer Kit.
         local i2c = hardware.i2c89;
         i2c.configure(CLOCK_SPEED_400_KHZ);
 
+        // Configure Temp/Humid sensor
         _th = HTS221(i2c, 0xBE);
         _th.setMode(HTS221_MODE.ONE_SHOT);
 

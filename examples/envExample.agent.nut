@@ -38,8 +38,8 @@ class LosantApp {
 
     function __statics__() {
         // API Token for Losant application
-        const LOSANT_API_TOKEN        = "<YOUR API TOKEN>";
-        const LOSANT_APPLICATION_ID   = "<YOUR APPLICAITON TOKEN>";
+        const LOSANT_API_TOKEN        = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjY4OGY1NTQ5MTFhMDAwMDY2YTIyYjkiLCJzdWJ0eXBlIjoiYXBpVG9rZW4iLCJzY29wZSI6WyJhbGwuQXBwbGljYXRpb24iXSwiaWF0IjoxNTMzNTc5MDkzLCJpc3MiOiJhcGkuZ2V0c3RydWN0dXJlLmlvIn0.nUSlNXiYQDOwnmW_qBO9TGaWD7W7wK0EV2iP_7N_zAk";
+        const LOSANT_APPLICATION_ID   = "5b688f192f203300060dbdc2";
         const DEVICE_NAME_TEMPLATE    = "Tracker_%s";
         const DEVICE_DESCRIPTION      = "Electric Imp Device";
         const LOSANT_DEVICE_CLASS     = "standalone";
@@ -192,14 +192,14 @@ class LosantApp {
 
     function _onStreamError(err, res) {
         server.error("Error occured while listening for commands.");
-        server.error(error);
+        server.error(err);
 
-        if (lsntTrackerApp.isDeviceCommandStreamOpen()) {
+        if (lsntApp.isDeviceCommandStreamOpen()) {
             // Parsing error occurred
-            server.log(response);
+            server.log(res);
         } else {
             // HTTP error occurred
-            if ("statuscode" in response) server.log("Status code: " + response.statuscode);
+            if ("statuscode" in res) server.log("Status code: " + res.statuscode);
             // Reopen stream
             openCommandListener();
         }
@@ -282,7 +282,6 @@ class LosantApp {
         ];
     }
 }
-
 
 app <- LosantApp();
 device.on("data", app.sendData.bindenv(app));
