@@ -38,8 +38,8 @@ class LosantApp {
 
     function __statics__() {
         // API Token for Losant application
-        const LOSANT_API_TOKEN        = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjY4OGY1NTQ5MTFhMDAwMDY2YTIyYjkiLCJzdWJ0eXBlIjoiYXBpVG9rZW4iLCJzY29wZSI6WyJhbGwuQXBwbGljYXRpb24iXSwiaWF0IjoxNTMzNTc5MDkzLCJpc3MiOiJhcGkuZ2V0c3RydWN0dXJlLmlvIn0.nUSlNXiYQDOwnmW_qBO9TGaWD7W7wK0EV2iP_7N_zAk";
-        const LOSANT_APPLICATION_ID   = "5b688f192f203300060dbdc2";
+        const LOSANT_API_TOKEN        = "";
+        const LOSANT_APPLICATION_ID   = "";
         const DEVICE_NAME_TEMPLATE    = "Tracker_%s";
         const DEVICE_DESCRIPTION      = "Electric Imp Device";
         const LOSANT_DEVICE_CLASS     = "standalone";
