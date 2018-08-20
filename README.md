@@ -171,7 +171,7 @@ lsntTrackerApp.getDevices(function(response) {
       case 0:
         // No devices found, create device
         lsntTrackerApp.createDevice(deviceInfo, function(resp) {
-          local bdy = http.jsondecode(resp.bdy);
+          local bdy = http.jsondecode(resp.body);
           lsntDeviceId = bdy.deviceId;
         });
         break;
@@ -269,7 +269,7 @@ lsntTrackerApp.deleteDevice(lsntDeviceId, function(response) {
 
 ### sendDeviceState(*losantDeviceId, deviceState, callback*) ###
 
-This methiod sends the current state of the device.
+This method sends the current state of the device.
 
 #### Parameters ####
 
@@ -458,7 +458,7 @@ This method opens a stream that listens for commands directed at the specified d
 | *losantDeviceId* | String | Yes | The device ID assigned by Losant when the device is created |
 | *onData* | Function | Yes | A function that will be called when a command is received from Losant. It has a single parameter, a table, containing the command received from Losant |
 | *onError* | Function | Yes | A function that will be called if the stream is closed unexpectedly or if a command cannot be parsed. It has two parameters: the error encountered, and the response from Losant |
-| *keepAliveTimeout* | Integer or float | No | Ammount of time in seconds to wait for a keepalive ping from Losant before closing the stream. Keepalive pings from Losant are sent every two seconds. Default: 30 seconds |
+| *keepAliveTimeout* | Integer or float | No | The amount of time in seconds to wait for a keepalive ping from Losant before closing the stream. Keepalive pings from Losant are sent every two seconds. Default: 30 seconds |
 
 #### Return Value ####
 
@@ -473,7 +473,7 @@ function onData(command) {
 }
 
 onError(error, response) {
-  server.error("Error occured while listening for commands.");
+  server.error("Error occurred while listening for commands.");
   server.error(error);
 
   if (lsntTrackerApp.isDeviceCommandStreamOpen()) {
@@ -583,13 +583,17 @@ String &mdash; A tag filter query parameter string.
 
 ```squirrel
 local searchTags = [
-    { "key"   : "agentId",
-      "value" : split(http.agenturl(), "/").top() },
-    { "value" : imp.configparams.deviceid }
+  { "key"   : "agentId",
+    "value" : split(http.agenturl(), "/").top() },
+  { "value" : imp.configparams.deviceid }
 ];
 
 local qparams = lsntTrackerApp.createTagFilterQueryParams(searchTags);
 ```
+
+## Examples ##
+
+Please see the [examples](https://github.com/electricimp/Losant/tree/master/examples) folder for further example code.
 
 ## License ##
 
