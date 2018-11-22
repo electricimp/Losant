@@ -1,10 +1,12 @@
 # Losant #
 
-This library wraps the Losant REST API. It supports most of the [Device Actions](https://docs.losant.com/rest-api/device/) and [Devices Actions](https://docs.losant.com/rest-api/devices/) allowing the Imp to create, update and delete devices on the Losant platform. The library also supports sending commands to devices and updating the current state of a device.
+This library provides integration with the [Losant Enterprise IoT Platform](https://www.losant.com) by wrapping the Losant REST API. It supports most of the [Device Actions](https://docs.losant.com/rest-api/device/) and [Devices Actions](https://docs.losant.com/rest-api/devices/) allowing the Electric Imp cloud agents to create, update and delete devices on the Losant platform. The library also supports sending commands to devices and updating the current state of a device.
 
 To use this library you need to have a Losant [account](https://accounts.losant.com/create-account) and [application](https://docs.losant.com/applications/overview/).
 
 **To use this library, add** `#require "Losant.agent.lib.nut:1.0.0"` **to the top of your device or agent code.**
+
+## Example ## 
 
 A complete, step-by-step recipe can be found in the [examples](./examples) folder.
 
