@@ -2,6 +2,10 @@
 
 This example shows how to connect your Electric Imp device to Losant using the Electric Imp Losant library. The example will walk you through how to display data from the device on a Losant dashboard and how to send commands from the dashboard to the device.
 
+<p align="center">
+   <img src="./losant-diagram.png" height=400>
+</p>
+
 ## Overview ##
 
 * Configure your impExplorer Kit with BlinkUp
