@@ -25,7 +25,7 @@ This example shows how to connect your Electric Imp device to Losant using the E
 
 ## Hardware ##
 
-This example is written for an [impExplorer Kit](https://store.electricimp.com/collections/featured-products/products/impexplorer-developer-kit?variant=31118866130), but can easily be modified to use with any imp that has an HTS221 temperature/humidity sensor on it. To use a different imp modify the device code i2c variable in the EnvMonitor construcor to match the i2c on your hardware.
+This example is written for an [impExplorer Kit](https://store.electricimp.com/collections/featured-products/products/impexplorer-developer-kit?variant=31118866130), but can easily be modified to use with any imp that has an HTS221 temperature/humidity sensor on it. To use a different imp modify the device code i2c variable in the EnvMonitor constructor to match the i2c on your hardware.
 
 ![Device code i2c variable](imgs/device_i2c.png "device code i2c variable")
 
@@ -97,7 +97,7 @@ This example is written for an [impExplorer Kit](https://store.electricimp.com/c
 ![Add humidity data to graph](imgs/18_graph_humid.png "Add humidity data to graph")
 * Click the gear icon on the top right of the dashboard.
 * Click *+ Add Block*
-![Add another block to dashboard](imgs/19_graph_humid.png "Add another block to dashboard")
+![Add another block to dashboard](imgs/19_add_block.png "Add another block to dashboard")
 * Find *Input Controls* and click *Customize*
 ![Add input controls block to dashboard](imgs/20_add_input_controls.png "Add input controls block to dashboard")
 * In the *Select Application* section in the *Choose an Application* dropdown make sure the selected application matches your Losant application name.
