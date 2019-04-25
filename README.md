@@ -6,6 +6,8 @@ To use this library you need to have a Losant [account](https://accounts.losant.
 
 **To use this library, add** `#require "Losant.agent.lib.nut:1.0.0"` **to the top of your agent code.**
 
+![Build Status](https://cse-ci.electricimp.com/app/rest/builds/buildType:(id:Losant_BuildAndTest)/statusIcon)
+
 ## Example ## 
 
 A complete, step-by-step recipe can be found in the [examples](./examples) folder.
