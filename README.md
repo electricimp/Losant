@@ -1,8 +1,8 @@
 # Losant #
 
-This library provides integration with the [Losant Enterprise IoT Platform](https://www.losant.com) by wrapping the Losant REST API. It supports most of the [Device Actions](https://docs.losant.com/rest-api/device/) and [Devices Actions](https://docs.losant.com/rest-api/devices/) allowing the Electric Imp cloud agents to create, update and delete devices on the Losant platform. The library also supports sending commands to devices and updating the current state of a device.
+This library provides integration with the [Losant Enterprise IoT Platform](https://www.losant.com) by wrapping the Losant REST API. It supports most of the [Device Actions](https://docs.losant.com/rest-api/device/) allowing the Electric Imp cloud agents to create, update and delete devices on the Losant platform. The library also supports sending commands to devices and updating the current state of a device.
 
-To use this library you need to have a Losant [account](https://accounts.losant.com/create-account) and a Losant[application](https://docs.losant.com/applications/overview/).
+To use this library you need to have a Losant [account](https://accounts.losant.com/create-account) and a Losant [application](https://docs.losant.com/applications/overview/).
 
 **To use this library, add** `#require "Losant.agent.lib.nut:1.0.0"` **to the top of your agent code.**
 
@@ -43,7 +43,7 @@ lsntTrackerApp <- Losant(LOSANT_APPLICATION_ID, LOSANT_DEVICE_API_TOKEN);
 
 ### Callback Functions ###
 
-All HTTPS requests to Losant are made asynchronously. Each method that makes an HTTP request will have a required callback parameter, a function that will executed when the server responds. The callback function has a single parameter, *response*, into which is passed a table containing the following keys:
+All HTTPS requests to Losant are made asynchronously. Each method that makes an HTTP request will have a required callback parameter, a function that will be executed when the server responds. The callback function has a single parameter, *response*, a table containing the following keys:
 
 | Key | Type | Description |
 | --- | --- | --- |
@@ -421,7 +421,7 @@ local cmd = { "time" : lsntTrackerApp.createIsoTimeStamp(),
 
 lsntTrackerApp.sendDeviceCommand(losantDeviceId, cmd, function(response) {
   server.log("Status Code: " + response.statuscode);
-  //Log if command was sent successfully
+  // Log if command was sent successfully
   server.log(response.body);
 });
 ```
